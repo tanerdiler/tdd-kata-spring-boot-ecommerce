@@ -10,7 +10,7 @@ import javax.validation.constraints.Positive;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
 @Getter @Setter
-public class DiscountWithRate extends Discount
+public class DiscountWithRate implements Discount
 {
     @DecimalMin("0.0")  @DecimalMax("100.0")
     private Double rate;
@@ -30,8 +30,6 @@ public class DiscountWithRate extends Discount
             discountAmount = limit;
         }
 
-        Double discountedPrice = productPrice - discountAmount;
-
-        return discountedPrice;
+        return productPrice - discountAmount;
     }
 }

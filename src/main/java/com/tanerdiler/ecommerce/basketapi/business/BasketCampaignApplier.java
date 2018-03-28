@@ -3,9 +3,10 @@ package com.tanerdiler.ecommerce.basketapi.business;
 import com.tanerdiler.ecommerce.basketapi.model.Basket;
 import com.tanerdiler.ecommerce.basketapi.model.Campaign;
 import com.tanerdiler.ecommerce.basketapi.model.IProduct;
-import com.tanerdiler.ecommerce.basketapi.model.Product;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 import static com.tanerdiler.ecommerce.basketapi.model.DiscountTargetType
         .CATEGORY;
@@ -61,7 +62,7 @@ public class BasketCampaignApplier
                         .max(comparing(IProduct::getPrice));
 
                 productWithMaxPrice
-                        .map(p->applier.apply(p))
+                        .map(applier::apply)
                         .ifPresent(p ->
                                 {
                                     productsWithDiscount.remove(p);

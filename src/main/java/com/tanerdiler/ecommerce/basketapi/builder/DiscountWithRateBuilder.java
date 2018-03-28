@@ -27,7 +27,6 @@ public class DiscountWithRateBuilder implements IValidatableBuilder
     @Override
     public DiscountWithRate get()
     {
-        DiscountWithRate discount = new DiscountWithRate(rate, limit, RATE);
-        return discount;
+        return new DiscountWithRate(rate, limit, RATE);
     }
 }

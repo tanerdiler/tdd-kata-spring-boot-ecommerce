@@ -37,7 +37,6 @@ public class ProductBuilder implements IValidatableBuilder<Product>
     @Override
     public Product get()
     {
-        Product product = new Product(id, name, price, category);
-        return product;
+        return new Product(id, name, price, category);
     }
 }

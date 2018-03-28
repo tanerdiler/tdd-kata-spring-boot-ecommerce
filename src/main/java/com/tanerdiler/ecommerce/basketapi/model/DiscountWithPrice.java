@@ -7,7 +7,7 @@ import javax.validation.constraints.Positive;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
 @Getter @Setter
-public class DiscountWithPrice extends Discount
+public class DiscountWithPrice implements Discount
 {
     @Positive
     private double price;
@@ -18,7 +18,6 @@ public class DiscountWithPrice extends Discount
     {
         Double discountAmount = price;
         Double productPrice = discountable.getPrice();
-        Double discountedPrice = productPrice - discountAmount;
-        return discountedPrice;
+        return productPrice - discountAmount;
     }
 }

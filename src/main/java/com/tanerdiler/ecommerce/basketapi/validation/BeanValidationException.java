@@ -8,7 +8,7 @@ import static java.util.Collections.unmodifiableList;
 
 public class BeanValidationException extends Exception
 {
-    private List<FieldError> fieldErrors = new ArrayList<>();
+    private final List<FieldError> fieldErrors = new ArrayList<>();
 
     public BeanValidationException add(FieldError error)
     {

@@ -1,6 +1,8 @@
 package com.tanerdiler.ecommerce.basketapi.builder;
 
-import com.tanerdiler.ecommerce.basketapi.model.*;
+import com.tanerdiler.ecommerce.basketapi.model.Campaign;
+import com.tanerdiler.ecommerce.basketapi.model.Discount;
+import com.tanerdiler.ecommerce.basketapi.model.DiscountTargetType;
 
 public class CampaignBuilder implements IValidatableBuilder<Campaign>
 {
@@ -8,6 +10,13 @@ public class CampaignBuilder implements IValidatableBuilder<Campaign>
     private Discount discount;
     private int entityId;
     private DiscountTargetType entityType;
+    private Integer id;
+
+    public CampaignBuilder withId(Integer id)
+    {
+        this.id = id;
+        return this;
+    }
 
     public CampaignBuilder withName(String name)
     {
@@ -31,8 +40,7 @@ public class CampaignBuilder implements IValidatableBuilder<Campaign>
     @Override
     public Campaign get()
     {
-        Campaign campaign = new Campaign(name, discount, entityId, entityType);
-        return campaign;
+        return new Campaign(id, name, discount, entityId, entityType);
     }
 }
 

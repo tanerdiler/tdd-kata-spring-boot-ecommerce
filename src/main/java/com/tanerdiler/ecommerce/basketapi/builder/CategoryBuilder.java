@@ -22,7 +22,6 @@ public class CategoryBuilder implements IValidatableBuilder<Category>
     @Override
     public Category get()
     {
-        Category category = new Category(id, name);
-        return category;
+        return new Category(id, name);
     }
 }

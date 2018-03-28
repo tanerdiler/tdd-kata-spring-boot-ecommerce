@@ -1,18 +1,17 @@
 package com.tanerdiler.ecommerce.basketapi.model;
 
-import com.google.common.collect.HashMultiset;
-import com.google.common.collect.Multiset;
 import com.google.common.collect.Sets;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static java.util.stream.Collectors.groupingBy;
 
 public class Basket
 {
     private Set<IProduct> products = new HashSet<>();
-    private Double totalPrice;
-
 
     public int getSize() {
 
@@ -38,7 +37,7 @@ public class Basket
 
     public Double getTotalPrice()
     {
-        return products.stream().map(p -> p.getPrice()).mapToDouble
+        return products.stream().map(IProduct::getPrice).mapToDouble
                 (Double::doubleValue).sum();
     }
 
