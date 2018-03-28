@@ -1,7 +1,5 @@
 package com.tanerdiler.ecommerce.basketapi.model;
 
-import lombok.EqualsAndHashCode;
-
 public class DiscountedProduct implements IProduct
 {
     private final Double discountedPrice;

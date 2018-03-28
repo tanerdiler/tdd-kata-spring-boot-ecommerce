@@ -1,10 +1,6 @@
 package com.tanerdiler.ecommerce.basketapi.builder;
 
-import com.tanerdiler.ecommerce.basketapi.model.Campaign;
-import com.tanerdiler.ecommerce.basketapi.model.DiscountType;
 import com.tanerdiler.ecommerce.basketapi.model.DiscountWithPrice;
-import com.tanerdiler.ecommerce.basketapi.validation.BeanValidationException;
-import com.tanerdiler.ecommerce.basketapi.validation.BeanValidator;
 
 import static com.tanerdiler.ecommerce.basketapi.model.DiscountType.AMOUNT;
 
@@ -21,7 +17,6 @@ public class DiscountWithPriceBuilder implements IValidatableBuilder<DiscountWit
     @Override
     public DiscountWithPrice get()
     {
-        DiscountWithPrice discount = new DiscountWithPrice(price, AMOUNT);
-        return discount;
+        return new DiscountWithPrice(price, AMOUNT);
     }
 }

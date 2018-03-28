@@ -11,6 +11,7 @@ import javax.validation.constraints.NotNull;
 @Getter @Setter
 public class Campaign {
 
+    private Integer id;
     @NotNull
     private String name;
     @NotNull

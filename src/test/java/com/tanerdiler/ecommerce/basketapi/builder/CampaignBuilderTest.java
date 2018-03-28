@@ -35,10 +35,11 @@ public class CampaignBuilderTest {
     }
 
     @Test
-    public void should_create_campaign_with_name()
+    public void should_create_campaign()
     {
-        Campaign campaign = Campaign.aNew().withName(name).get();
-        assertThat(campaign.getName()).isSameAs(name);
+        Campaign campaign = Campaign.aNew().withId(12).withName(name).get();
+        assertThat(campaign.getId()).isEqualTo(12);
+        assertThat(campaign.getName()).isEqualTo(name);
     }
 
     @Test

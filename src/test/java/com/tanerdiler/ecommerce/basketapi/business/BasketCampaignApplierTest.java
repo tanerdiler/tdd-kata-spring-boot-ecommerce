@@ -1,12 +1,10 @@
 package com.tanerdiler.ecommerce.basketapi.business;
 
-import com.google.common.collect.Lists;
 import com.tanerdiler.ecommerce.basketapi.model.*;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import static com.tanerdiler.ecommerce.basketapi.TestUtil.createCategory;

@@ -1,6 +1,9 @@
 package com.tanerdiler.ecommerce.basketapi.business;
 
-import com.tanerdiler.ecommerce.basketapi.model.*;
+import com.tanerdiler.ecommerce.basketapi.model.Campaign;
+import com.tanerdiler.ecommerce.basketapi.model.Discount;
+import com.tanerdiler.ecommerce.basketapi.model.DiscountedProduct;
+import com.tanerdiler.ecommerce.basketapi.model.IProduct;
 
 import java.util.function.Predicate;
 
@@ -47,9 +50,5 @@ public class CampaignApplier {
         }
 
         return new DiscountedProduct(discountable, discountedPrice);
-    }
-
-    public Campaign getCampaign() {
-        return campaign;
     }
 }
