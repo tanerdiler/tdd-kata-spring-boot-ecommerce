@@ -6,13 +6,8 @@ import static com.tanerdiler.ecommerce.basketapi.model.DiscountType.RATE;
 
 public class DiscountWithRateBuilder implements IValidatableBuilder
 {
-
     private Double limit;
     private Double rate;
-
-    public DiscountWithRateBuilder(){
-
-    }
 
     public DiscountWithRateBuilder withLimit(Double limit) {
         this.limit = limit;

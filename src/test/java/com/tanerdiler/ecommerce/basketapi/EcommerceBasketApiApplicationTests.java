@@ -13,7 +13,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class EcommerceBasketApiApplicationTests
 {
 	@Test
-	@Ignore
 	public void contextLoads()
 	{
 		boolean condition = true;
