@@ -1,6 +1,5 @@
 [![Build Status](https://travis-ci.org/tanerdiler/spring-boot-ecommerce-basketmanagement.svg?branch=master)](https://travis-ci.org/tanerdiler/spring-boot-ecommerce-basketmanagement)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=com.tanerdiler%3Aecommerce-basket-api&metric=alert_status)](https://sonarcloud.io/dashboard?id=com.tanerdiler%3Aecommerce-basket-api)
-[![sonarcov](https://sonarcloud.io/api/project_badges/measure?project=com.tanerdiler%3Aecommerce-basket-api&metric=coverage)](https://sonarcloud.io/dashboard?id=com.tanerdiler%3Aecommerce-basket-api)
 [![codecov](https://codecov.io/gh/tanerdiler/spring-boot-ecommerce-basketmanagement/branch/master/graph/badge.svg)](https://codecov.io/gh/tanerdiler/spring-boot-ecommerce-basketmanagement)
 
 
