@@ -8,12 +8,15 @@ cache:
     - '$HOME/.m2/repository'
     - '$HOME/.sonar/cache'
 
+env:
+  global:
+    - CODECOV_TOKEN=033a4e03-d0c0-4504-9299-71bf70f5ec4b
+
 install:
   - 'mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V'
 
 script:
   - 'mvn test'
-  - 'mvn verify -Dit'
   - 'mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar -Dsonar.host.url=https://sonarcloud.io -Dsonar.organization=tanerdiler-github -Dsonar.login=07e9e61be0269fd370b6ac719f2820c82d73c7bf'
 
 after_success:
