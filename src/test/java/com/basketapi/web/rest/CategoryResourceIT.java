@@ -1,8 +1,8 @@
 package com.basketapi.web.rest;
 
 
+import com.basketapi.BeanUtil;
 import com.basketapi.EcommerceBasketApiApplication;
-import com.basketapi.TestUtil;
 import com.basketapi.domain.model.Category;
 import com.basketapi.repository.CategoryRepository;
 import com.basketapi.service.CategoryService;
@@ -22,19 +22,19 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Random;
 
 import static com.basketapi.web.rest.TestUtil.APPLICATION_JSON_UTF8;
 import static com.basketapi.web.rest.TestUtil.convertObjectToJsonBytes;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request
         .MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request
+        .MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result
+        .MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result
+        .MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes= EcommerceBasketApiApplication.class, webEnvironment = SpringBootTest
@@ -45,10 +45,14 @@ public class CategoryResourceIT
     private CategoryService categoryService;
     @Autowired
     private CategoryRepository categoryRepository;
+
     @Autowired
     private CategoryDTOMapper categoryMapper;
     @Autowired
     private ExceptionTranslator exceptionTranslator;
+
+    @Autowired
+    private BeanUtil beanUtil;
 
     private MockMvc restMockMvc;
 
@@ -67,40 +71,31 @@ public class CategoryResourceIT
     @Transactional
     public void should_create_category() throws Exception {
         //GIVEN
-        categoryRepository.deleteAll();
-        int sizeBeforeCreate = categoryRepository.findAll().size();
         String name = "IT-CATEGORY-1";
-
-        //WHEN
-        Category category = Category.aNew().withName(name).get();
+        Category category = BeanUtil.createRandomCategory();
         CategoryDTO categoryDTO = categoryMapper.toDTO(category);
 
-        restMockMvc.perform(post("/api/v1/categories")
+        //WHEN
+        ResultActions result = restMockMvc.perform(post("/api/v1/categories")
                 .contentType(APPLICATION_JSON_UTF8)
-                .content(convertObjectToJsonBytes(categoryDTO)))
-                .andExpect(status().isCreated());
+                .content(convertObjectToJsonBytes(categoryDTO)));
+
         //THEN
-
-        // Validate the Coop in the database
-        List<Category> categoryList = categoryRepository.findAll();
-        assertThat(categoryList).hasSize(sizeBeforeCreate + 1);
-
-        Category persitedCategory = categoryList.get(categoryList.size() - 1);
-        assertThat(persitedCategory.getName()).isEqualTo(name);
+        result
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.name").value(equalTo(category.getName())));
     }
 
 
     @Test
     @Transactional
-    public void should_throw_badrequest_when_creating_category_with_id() throws Exception {
+    public void should_return_400_when_creating_category_with_id() throws
+            Exception {
         //GIVEN
         int sizeBeforeCreate = categoryRepository.findAll().size();
 
-        String categoryName = "IT-CATEGORY-1";
-
-        Category categoryWithId = new Category();
-        categoryWithId.setId(1);
-        categoryWithId.setName(categoryName);
+        Category categoryWithId = BeanUtil.createRandomCategory();
+        categoryWithId.setId(15);
 
         //WHEN
         CategoryDTO categoryDTO = categoryMapper.toDTO(categoryWithId);
@@ -115,20 +110,16 @@ public class CategoryResourceIT
 
     @Test
     @Transactional
-    public void should_get_categories() throws Exception {
+    public void should_get_categories() throws Exception
+    {
+        beanUtil.deleteAll();
+
         //GIVEN
-        categoryRepository.deleteAll();
+        Category category1 = BeanUtil.createRandomCategory();
+        Category category2 = BeanUtil.createRandomCategory();
 
-        String categoryNamePrefix = "IT-CATEGORY-";
-        Category categoryWithId = new Category();
-        categoryWithId.setName(categoryNamePrefix + "1");
-
-
-        Category categoryWithId2 = new Category();
-        categoryWithId2.setName(categoryNamePrefix + "2");
-
-        categoryRepository.save(categoryWithId);
-        categoryRepository.save(categoryWithId2);
+        category1 = categoryRepository.save(category1);
+        category2 = categoryRepository.save(category2);
 
         //WHEN
         ResultActions resultActions = restMockMvc
@@ -136,17 +127,16 @@ public class CategoryResourceIT
 
 
         //THEN
-
         resultActions.andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$.[*].id").value(
-                        hasItem(categoryWithId.getId().intValue())))
+                        hasItem(category1.getId().intValue())))
                 .andExpect(jsonPath("$.[*].id").value(
-                        hasItem(categoryWithId2.getId().intValue())))
+                        hasItem(category2.getId().intValue())))
                 .andExpect(jsonPath("$.[*].name").value(
-                        hasItem("IT-CATEGORY-" + 1)))
+                        hasItem(category1.getName())))
                 .andExpect(jsonPath("$.[*].name").value(
-                        hasItem("IT-CATEGORY-" + 2)));
+                        hasItem(category2.getName())));
     }
 
 
@@ -154,41 +144,40 @@ public class CategoryResourceIT
     @Transactional
     public void should_return_category() throws Exception {
         //GIVEN
-        String categoryNamePrefix = "IT-CATEGORY-";
-        Category category = new Category();
-        category.setName(categoryNamePrefix + "1");
+        Category category = BeanUtil.createRandomCategory();
 
         category = categoryRepository.save(category);
 
         //WHEN
-        restMockMvc.perform(
+        ResultActions result = restMockMvc.perform(
                 get("/api/v1/categories/" +
-                        category.getId()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name")
-                        .value(equalTo("IT-CATEGORY-1")));
+                        category.getId()));
 
         //THEN
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("$.name")
+                        .value(equalTo(category.getName())));
     }
 
 
     @Test
     @Transactional
     public void
-    should_throw_badrequest_when_creating_category_with_invalid_name() throws
+    should_return_400_when_creating_category_with_invalid_name() throws
     Exception {
 
         //GIVEN
         Category category = new Category();
         category.setName("");
-
         CategoryDTO categoryDTO = categoryMapper.toDTO(category);
+
         //WHEN
-        restMockMvc.perform(
+        ResultActions result = restMockMvc.perform(
                 post("/api/v1/categories")
                         .contentType(APPLICATION_JSON_UTF8)
-                        .content(convertObjectToJsonBytes(categoryDTO)))
-                .andExpect(status().isBadRequest());
+                        .content(convertObjectToJsonBytes(categoryDTO)));
+
         //THEN
+        result.andExpect(status().isBadRequest());
     }
 }

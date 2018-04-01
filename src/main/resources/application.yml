@@ -1,40 +1,36 @@
 server:
   port: 8080
-  session:
-    timeout: 900
-  context-path: /api
-
+  servlet:
+    context-path: /api
+    session:
+      timeout: 900
 management:
   port: 8081
-  #security:
-  #  enabled: false
-  #  roles: ACTUATOR # You can give a different role name like ADMIN
-  #context-path: /management
-
+  context-path: /management
 spring:
   application.name: basket.io-restapi
   pidfile: ${java.io.tmpdir}/basket.io-restapi.pid
-  profiles:
-    # The commented value for `active` can be replaced with valid Spring profiles to load.
-    # Otherwise, it will be filled in by maven when building the WAR file
-    # Either way, it can be overridden by `--spring.profiles.active` value passed in the commandline or `-Dspring.profiles.active` set in `JAVA_OPTS`
-    active: #spring.profiles.active#
   jackson:
     # https://stackoverflow.com/questions/30558047/spring-boot-return-dates-not-as-timestamps
     # http://www.baeldung.com/jackson-serialize-dates
     serialization:
       write_dates_as_timestamps: false
-
   jpa:
     open-in-view: true
     show-sql: false
     hibernate:
       naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
       ddl-auto: validate
-
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driverClassName: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/basket_io?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false
+    username: root
+    password: eternal
+  flyway:
+    enabled: true
   messages:
     basename: i18n/messages
-
 vm:
   defaultLocale:  tr
   locales: tr,en
@@ -58,24 +54,21 @@ endpoints:
 
 ---
 spring:
-  profiles:
-    active: dev
-    include: swagger
-
+  profiles: dev
+  flyway:
+    enabled: false
   devtools:
     restart:
       enabled: true
     livereload:
       enabled: true
-
   jackson:
     serialization.indent_output: true
-
   jpa:
     database: MYSQL
     show-sql: true
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: validate
 ---
 spring:
   profiles: prod

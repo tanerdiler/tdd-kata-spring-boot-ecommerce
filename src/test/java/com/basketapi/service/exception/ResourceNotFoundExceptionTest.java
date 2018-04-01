@@ -30,7 +30,7 @@ public class ResourceNotFoundExceptionTest
         assertThat(exception.getEntityName()).isEqualTo(ENTITY_NAME_PRODUCT);
         assertThat(exception.getExceptionPage()).isEqualTo(RESOURCE_NOT_FOUND_TYPE);
         assertThat(exception.getDefaultMessage()).isEqualTo(FAILED_SAVING_CAMPAIGN);
-        assertThat(exception.getKey()).isEqualTo(EXCEPTION_KEY);
+        assertThat(exception.getErrorKey()).isEqualTo(EXCEPTION_KEY);
         assertThat(exception.getAlertParameters()).containsAllEntriesOf(parameters);
     }
 }

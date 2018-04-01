@@ -49,7 +49,7 @@ public class ResourceNotFoundException extends RuntimeException
         return exceptionPage;
     }
 
-    public String getKey()
+    public String getErrorKey()
     {
         return EXCEPTION_KEY;
     }
@@ -57,7 +57,7 @@ public class ResourceNotFoundException extends RuntimeException
     public Map<String, Object> getAlertParameters()
     {
         Map<String, Object> parameters = new HashMap<>();
-        parameters.put("key", getKey());
+        parameters.put("key", getErrorKey());
         parameters.put("entityName", entityName);
         parameters.put("entityId", entityId);
         return parameters;

@@ -5,8 +5,8 @@ import org.junit.Test;
 import java.util.List;
 import java.util.Map;
 
-import static com.basketapi.TestUtil.createCategory;
-import static com.basketapi.TestUtil.createProduct;
+import static com.basketapi.BeanUtil.createCategory;
+import static com.basketapi.BeanUtil.createProduct;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class BasketTest

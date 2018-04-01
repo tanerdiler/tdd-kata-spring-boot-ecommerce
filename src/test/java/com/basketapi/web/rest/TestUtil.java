@@ -47,6 +47,17 @@ public class TestUtil {
         return mapper.writeValueAsBytes(object);
     }
 
+    public static <T> T convertJsonBytesToObject(Class<T> clazz, byte[] bytes)
+            throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+
+        JavaTimeModule module = new JavaTimeModule();
+        mapper.registerModule(module);
+
+        return mapper.readValue(bytes, clazz);
+    }
+
     /**
      * Create a byte array with a specific size filled with specified data.
      *

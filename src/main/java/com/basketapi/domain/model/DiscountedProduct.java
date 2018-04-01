@@ -27,6 +27,11 @@ public class DiscountedProduct implements IProduct
     }
 
     @Override
+    public String getName() {
+        return origin.getName();
+    }
+
+    @Override
     public Category getCategory() {
         return origin.getCategory();
     }

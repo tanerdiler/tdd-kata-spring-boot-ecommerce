@@ -3,8 +3,8 @@ package com.basketapi.domain.business;
 import com.basketapi.domain.model.*;
 import org.junit.Test;
 
-import static com.basketapi.TestUtil.createCategory;
-import static com.basketapi.TestUtil.createProduct;
+import static com.basketapi.BeanUtil.createCategory;
+import static com.basketapi.BeanUtil.createProduct;
 import static com.basketapi.domain.model.DiscountTargetType.CATEGORY;
 import static com.basketapi.domain.model.DiscountTargetType.PRODUCT;
 import static org.assertj.core.api.Assertions.assertThat;

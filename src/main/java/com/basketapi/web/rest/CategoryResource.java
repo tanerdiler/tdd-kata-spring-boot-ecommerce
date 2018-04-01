@@ -1,6 +1,5 @@
 package com.basketapi.web.rest;
 
-import com.basketapi.domain.model.Category;
 import com.basketapi.service.CategoryService;
 import com.basketapi.service.dto.CategoryDTO;
 import org.slf4j.Logger;
@@ -41,7 +40,7 @@ public class CategoryResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PostMapping("/api/v1/categories")
-    public ResponseEntity<CategoryDTO> createCage(@RequestBody CategoryDTO
+    public ResponseEntity<CategoryDTO> createCategory(@RequestBody CategoryDTO
                                                               categoryDTO)
             throws URISyntaxException
     {
