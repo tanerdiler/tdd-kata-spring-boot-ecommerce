@@ -7,6 +7,7 @@ import com.basketapi.domain.validation.BeanValidator;
 import com.basketapi.repository.ProductRepository;
 import com.basketapi.service.dto.CategoryDTO;
 import com.basketapi.service.dto.ProductDTO;
+import com.basketapi.service.exception.EntityWithIdException;
 import com.basketapi.service.exception.ResourceNotFoundException;
 import com.basketapi.service.mapper.CategoryDTOMapper;
 import com.basketapi.service.mapper.ProductDTOMapper;
@@ -39,6 +40,18 @@ public class ProductServiceTest extends BaseMockitoTest
             ()), new BeanValidator
             ());
 
+    @Test(expected = EntityWithIdException.class)
+    public void
+    should_throw_EntityWithIdException_while_saving_product_with_id()
+            throws BeanValidationException
+    {
+        when(categoryService.checkIfExists(5)).thenReturn(true);
+
+        ProductDTO dto = createDTO(1);
+        dto.getCategory().setId(5);
+
+        service.save(dto);
+    }
 
     @Test
     public void should_delete_product()
@@ -76,6 +89,34 @@ public class ProductServiceTest extends BaseMockitoTest
         when(categoryService.checkIfExists(5)).thenReturn(true);
 
         when(repo.save(any(Product.class))).thenReturn(product);
+
+        ProductDTO  persistedProductDTO = service.save(dto);
+
+        assertThat(persistedProductDTO)
+                .isEqualToComparingOnlyGivenFields
+                        (dtoOfPersisted, "id",
+                                "name","price");
+
+        assertThat(persistedProductDTO.getCategory())
+                .isEqualToComparingFieldByField
+                        (dtoOfPersisted.getCategory());
+    }
+
+
+    @Test(expected = ResourceNotFoundException.class)
+    public void
+    should_thrown_ResourceNotFoundException_campaign_not_persisted_yet()
+    {
+        ProductDTO dto = createDTO(null);
+        dto.getCategory().setId(5);
+
+        Product product = createEntity(1);
+        product.getCategory().setId(5);
+
+        ProductDTO dtoOfPersisted = createDTO(1);
+        dtoOfPersisted.getCategory().setId(5);
+
+        when(categoryService.checkIfExists(5)).thenReturn(false);
 
         ProductDTO  persistedProductDTO = service.save(dto);
 

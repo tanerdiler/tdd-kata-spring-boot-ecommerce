@@ -4,16 +4,14 @@ package com.basketapi.service.exception;
 import com.basketapi.domain.validation.BeanValidationException;
 import com.basketapi.service.ApplicationConstants;
 import com.basketapi.web.rest.util.HeaderUtil;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.zalando.problem.DefaultProblem;
 import org.zalando.problem.Problem;
 import org.zalando.problem.ProblemBuilder;
+import org.zalando.problem.Status;
 import org.zalando.problem.spring.web.advice.ProblemHandling;
 import org.zalando.problem.spring.web.advice.validation
         .ConstraintViolationProblem;
@@ -21,8 +19,6 @@ import org.zalando.problem.spring.web.advice.validation
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Controller advice to translate the server side exceptions to client-friendly json structures.
@@ -90,7 +86,31 @@ public class ExceptionTranslator implements ProblemHandling {
 //        return create(ex, request, HeaderUtil.createFailureAlert(ex.getEntityName(), ex.getErrorKey(), ex.getMessage()));
 //    }
 
+    @ExceptionHandler(EntityWithIdException.class)
+    public ResponseEntity<Problem> handleMethodArgumentNotValid(EntityWithIdException ex, @Nonnull NativeWebRequest request) {
+        Problem problem = Problem.builder()
+                .withType(ApplicationConstants.RESOURCE_WITH_ID_TYPE)
+                .withTitle("Resource not saved.")
+                .withStatus(defaultConstraintViolationStatus())
+                .with("message", ApplicationConstants.ERR_VALIDATION)
+                .withDetail("Resource with id is not permitted to be saved.")
+                .build();
+        return create(ex, problem, request, HeaderUtil.createFailureAlert(ex.getEntityName(), ex.getErrorKey(), ex.getMessage()));
+    }
 
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<Problem> handleMethodArgumentNotValid(ResourceNotFoundException ex,
+                                                                @Nonnull NativeWebRequest request) {
+        Problem problem = Problem.builder()
+                .withType(ApplicationConstants.RESOURCE_NOT_FOUND_TYPE)
+                .withTitle("Resource not found.")
+                .withStatus(Status.NOT_FOUND)
+                .with("message", ex.getErrorKey())
+                .with("entityId", ex.getEntityId())
+                .with("entityName", ex.getEntityName())
+                .build();
+        return create(ex, problem, request, HeaderUtil.createFailureAlert(ex.getEntityName(), ex.getErrorKey(), ex.getMessage()));
+    }
 
     @ExceptionHandler(BeanValidationException.class)
     public ResponseEntity<Problem> handleMethodArgumentNotValid(BeanValidationException ex, @Nonnull NativeWebRequest request) {

@@ -26,6 +26,8 @@ public class ApplicationConstants
     public static final String ENTITY_NAME_PRODUCT = "product";
     public static final String ENTITY_NAME_CATEGORY = "category";
 
+    public static final String FAILED_SAVING_PRODUCT = "Saving product " +
+            "operation failed";
     public static final String FAILED_SAVING_CAMPAIGN = "Saving campaign operation failed";
     public static final String FAILED_SAVING_CATEGORY = "Saving category " +
             "operation failed";

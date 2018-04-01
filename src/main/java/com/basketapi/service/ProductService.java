@@ -3,6 +3,7 @@ package com.basketapi.service;
 import com.basketapi.domain.model.Product;
 import com.basketapi.repository.ProductRepository;
 import com.basketapi.service.dto.ProductDTO;
+import com.basketapi.service.exception.EntityWithIdException;
 import com.basketapi.service.exception.ResourceNotFoundException;
 import com.basketapi.service.mapper.ProductDTOMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,12 +50,20 @@ public class ProductService implements IService
                     ENTITY_NAME_CATEGORY, dto.getCategory().getId());
         }
 
+        if(dto.getId()!=null)
+        {
+            throw  new
+                    EntityWithIdException(FAILED_SAVING_PRODUCT,
+                    ENTITY_NAME_PRODUCT, dto
+                    .getId());
+        }
+
         Product productToPersist = dtoMapper.toEntity(dto);
 
         return dtoMapper.toDTO(repository.save(productToPersist));
     }
 
-    @Transactional(readOnly = true, propagation = SUPPORTS)
+    @Transactional(readOnly = true, propagation = SUPPORTS, isolation = Isolation.READ_UNCOMMITTED)
     public List<ProductDTO> findAll()
     {
         return repository.findAll().stream().map(dtoMapper::toDTO)

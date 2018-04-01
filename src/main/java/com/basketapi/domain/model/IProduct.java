@@ -6,4 +6,6 @@ public interface IProduct
     Double getOriginalPrice();
     Double getPrice();
     Category getCategory();
+
+    String getName();
 }

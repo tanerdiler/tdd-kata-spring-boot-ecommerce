@@ -3,6 +3,7 @@ package com.basketapi.service;
 import com.basketapi.domain.model.Campaign;
 import com.basketapi.repository.CampaignRepository;
 import com.basketapi.service.dto.CampaignDTO;
+import com.basketapi.service.exception.EntityWithIdException;
 import com.basketapi.service.exception.ResourceNotFoundException;
 import com.basketapi.service.mapper.CampaignDTOMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +48,14 @@ public class CampaignService implements IService
     @Transactional(propagation = REQUIRED)
     public CampaignDTO save(CampaignDTO dto)
     {
+        if(dto.getId()!=null)
+        {
+            throw  new
+                    EntityWithIdException(FAILED_SAVING_CAMPAIGN,
+                    ENTITY_NAME_CAMPAIGN, dto
+                    .getId());
+        }
+
         // TODO TARGET TYPE LOGIC
         if(PRODUCT.equals(dto.getTargetType())
                 && !productService.checkIfExists(dto.getTargetId()))
@@ -54,7 +63,7 @@ public class CampaignService implements IService
             throw new ResourceNotFoundException(FAILED_SAVING_CAMPAIGN,
                     ENTITY_NAME_PRODUCT, dto.getTargetId());
         }
-        else if(!categoryService.checkIfExists(dto.getId()))
+        else if(!categoryService.checkIfExists(dto.getTargetId()))
         {
             throw new ResourceNotFoundException(FAILED_SAVING_CAMPAIGN,
                     ENTITY_NAME_CATEGORY, dto.getTargetId());

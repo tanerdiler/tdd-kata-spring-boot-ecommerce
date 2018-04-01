@@ -5,8 +5,6 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.basketapi.service.ApplicationConstants
-        .RESOURCE_NOT_FOUND_TYPE;
 import static com.basketapi.service.ApplicationConstants.RESOURCE_WITH_ID_TYPE;
 
 
@@ -50,7 +48,7 @@ public class EntityWithIdException extends RuntimeException
         return exceptionPage;
     }
 
-    public String getKey()
+    public String getErrorKey()
     {
         return EXCEPTION_KEY;
     }
@@ -58,7 +56,7 @@ public class EntityWithIdException extends RuntimeException
     public Map<String, Object> getAlertParameters()
     {
         Map<String, Object> parameters = new HashMap<>();
-        parameters.put("key", getKey());
+        parameters.put("key", getErrorKey());
         parameters.put("entityName", entityName);
         parameters.put("entityId", entityId);
         return parameters;

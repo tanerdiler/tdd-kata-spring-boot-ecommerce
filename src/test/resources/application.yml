@@ -1,0 +1,37 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /xxx
+    session:
+      timeout: 900
+spring:
+  flyway:
+    enabled: false
+  application.name: basket.io-restapi
+  pidfile: ${java.io.tmpdir}/basket.io-restapi.pid
+  datasource:
+    driverClassName: org.h2.Driver
+    poolName: bird.io-restapi-dbconnectionpool
+    url: jdbc:h2:mem:test
+    username: root
+    password: 1q2w3e4rW
+  jpa:
+    database: H2
+    show-sql: false
+    hibernate:
+      naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
+      ddl-auto: create-drop
+  endpoints:
+    autoconfig.enabled: false
+    beans.enabled: false
+    configprops.enabled: false
+    dump.enabled: true
+    env.enabled: false
+    health.enabled: true
+    info.enabled: false
+    mappings.enabled: false
+    metrics.enabled: true
+    shutdown.enabled: false
+    trace.enabled: false
+
+
