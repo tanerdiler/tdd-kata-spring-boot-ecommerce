@@ -13,8 +13,7 @@ import org.zalando.problem.Problem;
 import org.zalando.problem.ProblemBuilder;
 import org.zalando.problem.Status;
 import org.zalando.problem.spring.web.advice.ProblemHandling;
-import org.zalando.problem.spring.web.advice.validation
-        .ConstraintViolationProblem;
+import org.zalando.problem.spring.web.advice.validation.ConstraintViolationProblem;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -26,6 +25,11 @@ import javax.servlet.http.HttpServletRequest;
  */
 @ControllerAdvice
 public class ExceptionTranslator implements ProblemHandling {
+
+    public static final String ENTITY_ID = "entityId";
+    public static final String ENTITY_NAME = "entityName";
+    public static final String MESSAGE = "message";
+    public static final String FIELD_ERRORS = "fieldErrors";
 
     /**
      * Post-process Problem payload to add the message key for front-end if needed
@@ -64,35 +68,13 @@ public class ExceptionTranslator implements ProblemHandling {
         }
     }
 
-//    @Override
-//    public ResponseEntity<Problem> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, @Nonnull NativeWebRequest request) {
-//        BindingResult result = ex.getBindingResult();
-//        List<FieldError> fieldErrors = result.getFieldErrors().stream()
-//                .map(f -> new FieldError(f.getObjectName(), f.getField(), f.getCode()))
-//                .collect(Collectors.toList());
-//
-//        Problem problem = Problem.builder()
-//                .withType(ApplicationConstants.CONSTRAINT_VIOLATION_TYPE)
-//                .withTitle("Method argument not valid")
-//                .withStatus(defaultConstraintViolationStatus())
-//                .with("message", ApplicationConstants.ERR_VALIDATION)
-//                .with("fieldErrors", fieldErrors)
-//                .build();
-//        return create(ex, problem, request);
-//    }
-//
-//    @ExceptionHandler(BadRequestAlertException.class)
-//    public ResponseEntity<Problem> handleBadRequestAlertException(BadRequestAlertException ex, NativeWebRequest request) {
-//        return create(ex, request, HeaderUtil.createFailureAlert(ex.getEntityName(), ex.getErrorKey(), ex.getMessage()));
-//    }
-
     @ExceptionHandler(EntityWithIdException.class)
     public ResponseEntity<Problem> handleMethodArgumentNotValid(EntityWithIdException ex, @Nonnull NativeWebRequest request) {
         Problem problem = Problem.builder()
                 .withType(ApplicationConstants.RESOURCE_WITH_ID_TYPE)
                 .withTitle("Resource not saved.")
                 .withStatus(defaultConstraintViolationStatus())
-                .with("message", ApplicationConstants.ERR_VALIDATION)
+                .with(MESSAGE, ApplicationConstants.ERR_VALIDATION)
                 .withDetail("Resource with id is not permitted to be saved.")
                 .build();
         return create(ex, problem, request, HeaderUtil.createFailureAlert(ex.getEntityName(), ex.getErrorKey(), ex.getMessage()));
@@ -105,9 +87,9 @@ public class ExceptionTranslator implements ProblemHandling {
                 .withType(ApplicationConstants.RESOURCE_NOT_FOUND_TYPE)
                 .withTitle("Resource not found.")
                 .withStatus(Status.NOT_FOUND)
-                .with("message", ex.getErrorKey())
-                .with("entityId", ex.getEntityId())
-                .with("entityName", ex.getEntityName())
+                .with(MESSAGE, ex.getErrorKey())
+                .with(ENTITY_ID, ex.getEntityId())
+                .with(ENTITY_NAME, ex.getEntityName())
                 .build();
         return create(ex, problem, request, HeaderUtil.createFailureAlert(ex.getEntityName(), ex.getErrorKey(), ex.getMessage()));
     }
@@ -118,8 +100,8 @@ public class ExceptionTranslator implements ProblemHandling {
                 .withType(ApplicationConstants.CONSTRAINT_VIOLATION_TYPE)
                 .withTitle("Method argument not valid")
                 .withStatus(defaultConstraintViolationStatus())
-                .with("message", ApplicationConstants.ERR_VALIDATION)
-                .with("fieldErrors", ex.getFieldErrors())
+                .with(MESSAGE, ApplicationConstants.ERR_VALIDATION)
+                .with(FIELD_ERRORS, ex.getFieldErrors())
                 .build();
         return create(ex, problem, request);
     }

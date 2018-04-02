@@ -11,10 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static com.basketapi.domain.model.DiscountTargetType.CATEGORY;
 import static com.basketapi.domain.model.DiscountTargetType.PRODUCT;
@@ -104,6 +101,15 @@ public class BeanUtil
                 .get();
     }
 
+
+
+    public static Category createRandomCategoryWithId()
+    {
+        return Category.aNew()
+                .withId(Math.abs(new Random().nextInt()))
+                .withName("IT-CATEGORY"+UUID.randomUUID())
+                .get();
+    }
 
     public static Category createRandomCategory()
     {

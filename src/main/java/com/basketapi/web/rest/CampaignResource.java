@@ -6,17 +6,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 
+import static com.basketapi.service.ApplicationConstants.ENTITY_NAME_CAMPAIGN;
 import static com.basketapi.service.ApplicationConstants.ENTITY_NAME_CATEGORY;
 import static com.basketapi.web.rest.util.HeaderUtil.createEntityCreationAlert;
+import static com.basketapi.web.rest.util.HeaderUtil.createEntityDeletionAlert;
+import static com.basketapi.web.rest.util.HeaderUtil.createEntityUpdateAlert;
 
 @Controller
 public class CampaignResource
@@ -31,6 +32,51 @@ public class CampaignResource
     }
 
     /**
+     * PUT  /api/v1/campaigns : Updates an existing campaign.
+     *
+     * @param id the identifier of campaign to update
+     * @param campaignDTO the campaignDTO to update
+     * @return the ResponseEntity with status 200 (OK) and with body the updated campaignDTO,
+     * or with status 400 (Bad Request) if the campaignDTO is not valid,
+     * or with status 500 (Internal Server Error) if the campaignDTO couldn't be updated
+     */
+    @PutMapping("/api/v1/campaigns/{id}")
+    public ResponseEntity updateCampaign(@PathVariable("id") Integer id,
+                                         @RequestBody @Valid CampaignDTO campaignDTO)
+    {
+        log.debug("REST request to update Category : {}", campaignDTO);
+
+        campaignService.update(id, campaignDTO);
+
+        return ResponseEntity
+                .noContent()
+                .headers(createEntityUpdateAlert(ENTITY_NAME_CAMPAIGN, id.toString()))
+                .build();
+    }
+
+    /**
+     * DELETE  /api/v1/campaigns : Delete the specified Campaign.
+     *
+     * @param id the campaign identifier
+     * @return the ResponseEntity with status 204 (NoContent),
+     * or with status 404 (Not Fount) if the campaign has
+     * not been found
+     */
+    @DeleteMapping("/api/v1/campaigns/{id}")
+    public ResponseEntity deleteCampaign(@PathVariable("id") Integer id)
+    {
+        log.debug("REST request to delete Campaign : {}",
+                id);
+
+        campaignService.delete(id);
+
+        return ResponseEntity
+                .noContent()
+                .headers(createEntityDeletionAlert(ENTITY_NAME_CAMPAIGN, id.toString()))
+                .build();
+    }
+
+    /**
      * POST  /api/v1/campaigns : Create a new campaign.
      *
      * @param campaignDTO the campaignDTO to create
@@ -40,8 +86,7 @@ public class CampaignResource
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PostMapping("/api/v1/campaigns")
-    public ResponseEntity<CampaignDTO> createCampaign(@RequestBody CampaignDTO
-                                                            campaignDTO)
+    public ResponseEntity<CampaignDTO> createCampaign(@RequestBody CampaignDTO campaignDTO)
             throws URISyntaxException
     {
         log.debug("REST request to save Campaign : {}",

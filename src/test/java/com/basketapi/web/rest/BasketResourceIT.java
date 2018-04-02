@@ -24,10 +24,8 @@ import java.util.List;
 import static com.basketapi.BeanUtil.*;
 import static com.basketapi.web.rest.TestUtil.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request
-        .MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result
-        .MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes= EcommerceBasketApiApplication.class, webEnvironment = SpringBootTest

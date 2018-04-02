@@ -1,5 +1,6 @@
 package com.basketapi.service;
 
+import com.basketapi.BeanUtil;
 import com.basketapi.config.BaseMockitoTest;
 import com.basketapi.domain.model.Category;
 import com.basketapi.domain.validation.BeanValidationException;
@@ -53,6 +54,39 @@ public class CategoryServiceTest extends BaseMockitoTest
         when(service.checkIfExists(1)).thenReturn(false);
 
         service.delete(1);
+    }
+
+    @Test
+    public void should_update_category()
+            throws BeanValidationException
+    {
+        //GIVEN
+        Category category = BeanUtil.createRandomCategory();
+        category.setId(12);
+        CategoryDTO dto = mapper.toDTO(category);
+
+        //WHEN
+        when(service.checkIfExists(12)).thenReturn(true);
+        when(repo.save(any(Category.class))).thenReturn(category);
+        CategoryDTO  persistedCategoryDTO = service.update(12, dto);
+
+        //THEN
+        assertThat(persistedCategoryDTO).isEqualToComparingFieldByField(dto);
+    }
+
+    @Test(expected = ResourceNotFoundException.class)
+    public void should_throw_ResourceNotFoundException_when_specified_category_not_found_on_updating()
+            throws BeanValidationException
+    {
+        //GIVEN
+        Category category = BeanUtil.createRandomCategory();
+        category.setId(Integer.MAX_VALUE);
+
+        //WHEN
+        when(service.checkIfExists(1)).thenReturn(true);
+        service.update(category.getId(), mapper.toDTO(category));
+
+        //THEN
     }
 
     @Test

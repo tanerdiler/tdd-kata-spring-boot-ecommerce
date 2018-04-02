@@ -25,18 +25,14 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Random;
+import java.util.UUID;
 
 import static com.basketapi.web.rest.TestUtil.APPLICATION_JSON_UTF8;
 import static com.basketapi.web.rest.TestUtil.convertObjectToJsonBytes;
 import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.request
-        .MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request
-        .MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result
-        .MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result
-        .MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
 @RunWith(SpringRunner.class)
@@ -70,6 +66,33 @@ public class ProductResourceIT
         this.restMockMvc = MockMvcBuilders.standaloneSetup(productResource)
                 .setControllerAdvice(exceptionTranslator)
                 .build();
+    }
+
+    @Test
+    @Transactional
+    public void should_delete_product() throws Exception
+    {
+        String name = "IT_PRODUCT-"+ UUID.randomUUID();
+
+        Category category = BeanUtil.createRandomCategoryAndSave
+                (categoryRepository);
+
+        Product product = BeanUtil.createRandomProduct(category);
+
+        product = productRepository.save(product);
+
+        restMockMvc.perform(delete("/api/v1/products/"+product.getId()))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @Transactional
+    public void should_return_400_when_category_to_delete_is_not_found() throws
+            Exception
+    {
+        restMockMvc.perform(delete("/api/v1/products/"+(Integer.MAX_VALUE-new
+                Random().nextInt())))
+                .andExpect(status().isNotFound());
     }
 
     @Test

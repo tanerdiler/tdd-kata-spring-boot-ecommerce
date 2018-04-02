@@ -5,18 +5,12 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.basketapi.service.ApplicationConstants
-        .RESOURCE_NOT_FOUND_TYPE;
+import static com.basketapi.service.ApplicationConstants.RESOURCE_NOT_FOUND_TYPE;
 
 
-public class ResourceNotFoundException extends RuntimeException
+public class ResourceNotFoundException extends RestException
 {
     public static final String EXCEPTION_KEY = "error.resource.notfound";
-
-    private final Integer entityId;
-    private final URI exceptionPage;
-    private final String defaultMessage;
-    private final String entityName;
 
     public ResourceNotFoundException(String defaultMessage, String
             entityName, Integer entityId)
@@ -27,27 +21,10 @@ public class ResourceNotFoundException extends RuntimeException
     public ResourceNotFoundException(URI page, String defaultMessage, String
             entityName, Integer entityId)
     {
-        this.exceptionPage = page;
-        this.defaultMessage = defaultMessage;
-        this.entityName = entityName;
-        this.entityId = entityId;
+        super(entityId, entityName, page, defaultMessage);
     }
 
-    public Integer getEntityId(){
-        return entityId;
-    }
 
-    public String getEntityName() {
-        return entityName;
-    }
-
-    public String getDefaultMessage() {
-        return defaultMessage;
-    }
-
-    public URI getExceptionPage() {
-        return exceptionPage;
-    }
 
     public String getErrorKey()
     {
@@ -58,8 +35,8 @@ public class ResourceNotFoundException extends RuntimeException
     {
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("key", getErrorKey());
-        parameters.put("entityName", entityName);
-        parameters.put("entityId", entityId);
+        parameters.put("entityName", getEntityName());
+        parameters.put("entityId", getEntityId());
         return parameters;
     }
 }

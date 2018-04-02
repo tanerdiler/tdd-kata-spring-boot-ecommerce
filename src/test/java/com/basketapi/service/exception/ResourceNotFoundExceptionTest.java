@@ -6,8 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.basketapi.service.ApplicationConstants.*;
-import static com.basketapi.service.exception.ResourceNotFoundException
-        .EXCEPTION_KEY;
+import static com.basketapi.service.exception.ResourceNotFoundException.EXCEPTION_KEY;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
 public class ResourceNotFoundExceptionTest

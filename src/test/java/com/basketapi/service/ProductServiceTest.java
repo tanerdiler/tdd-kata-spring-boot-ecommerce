@@ -1,6 +1,8 @@
 package com.basketapi.service;
 
+import com.basketapi.BeanUtil;
 import com.basketapi.config.BaseMockitoTest;
+import com.basketapi.domain.model.Category;
 import com.basketapi.domain.model.Product;
 import com.basketapi.domain.validation.BeanValidationException;
 import com.basketapi.domain.validation.BeanValidator;
@@ -55,7 +57,6 @@ public class ProductServiceTest extends BaseMockitoTest
 
     @Test
     public void should_delete_product()
-            throws BeanValidationException
     {
         when(service.checkIfExists(1)).thenReturn(true);
 
@@ -66,11 +67,43 @@ public class ProductServiceTest extends BaseMockitoTest
 
     @Test(expected = ResourceNotFoundException.class)
     public void should_throw_ResourceNotFoundException_while_deleting_product()
-            throws BeanValidationException
     {
         when(service.checkIfExists(1)).thenReturn(false);
 
         service.delete(1);
+    }
+
+    @Test
+    public void should_update_product()
+            throws BeanValidationException
+    {
+        //GIVEN
+        Category category = BeanUtil.createRandomCategoryWithId();
+        Product product = BeanUtil.createRandomProduct(category);
+        product.setId(12);
+        ProductDTO dto = mapper.toDTO(product);
+
+        //WHEN
+        when(service.checkIfExists(12)).thenReturn(true);
+        when(repo.save(any(Product.class))).thenReturn(product);
+        ProductDTO  persistedProductDTO = service.update(12, dto);
+
+        //THEN
+        assertThat(persistedProductDTO)
+                .isEqualToComparingOnlyGivenFields(dto,"id", "price", "name");
+    }
+
+    @Test(expected = ResourceNotFoundException.class)
+    public void should_throw_ResourceNotFoundException_when_specified_campaign_not_found_on_updating()
+            throws BeanValidationException
+    {
+        Category category = BeanUtil.createRandomCategory();
+        Product product = BeanUtil.createRandomProduct(category);
+        product.setId(Integer.MAX_VALUE);
+
+        when(service.checkIfExists(1)).thenReturn(true);
+
+        service.update(product.getId(), mapper.toDTO(product));
     }
 
     @Test

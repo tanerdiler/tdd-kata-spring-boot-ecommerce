@@ -21,20 +21,17 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import javax.persistence.EntityManager;
+import java.util.Random;
+import java.util.UUID;
 
 import static com.basketapi.web.rest.TestUtil.APPLICATION_JSON_UTF8;
 import static com.basketapi.web.rest.TestUtil.convertObjectToJsonBytes;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.request
-        .MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request
-        .MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result
-        .MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result
-        .MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes= EcommerceBasketApiApplication.class, webEnvironment = SpringBootTest
@@ -50,6 +47,9 @@ public class CategoryResourceIT
     private CategoryDTOMapper categoryMapper;
     @Autowired
     private ExceptionTranslator exceptionTranslator;
+
+    @Autowired
+    private EntityManager em;
 
     @Autowired
     private BeanUtil beanUtil;
@@ -69,43 +69,73 @@ public class CategoryResourceIT
 
     @Test
     @Transactional
-    public void should_create_category() throws Exception {
-        //GIVEN
-        String name = "IT-CATEGORY-1";
-        Category category = BeanUtil.createRandomCategory();
-        CategoryDTO categoryDTO = categoryMapper.toDTO(category);
+    public void should_delete_category() throws Exception
+    {
+        String name = "IT-CATEGORY-"+ UUID.randomUUID();
 
-        //WHEN
-        ResultActions result = restMockMvc.perform(post("/api/v1/categories")
-                .contentType(APPLICATION_JSON_UTF8)
-                .content(convertObjectToJsonBytes(categoryDTO)));
+        Category category = BeanUtil.createRandomCategoryAndSave
+                (categoryRepository);
 
-        //THEN
-        result
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.name").value(equalTo(category.getName())));
+        category = categoryRepository.save(category);
+
+        restMockMvc.perform(delete("/api/v1/categories/"+category.getId()))
+                .andExpect(status().isNoContent());
     }
-
 
     @Test
     @Transactional
-    public void should_return_400_when_creating_category_with_id() throws
-            Exception {
-        //GIVEN
-        int sizeBeforeCreate = categoryRepository.findAll().size();
+    public void should_return_400_when_campaign_to_delete_is_not_found() throws
+            Exception
+    {
+        restMockMvc.perform(delete("/api/v1/categories/"+(Integer.MAX_VALUE-new
+                Random().nextInt())))
+                .andExpect(status().isNotFound());
+    }
 
-        Category categoryWithId = BeanUtil.createRandomCategory();
-        categoryWithId.setId(15);
+    @Test
+    @Transactional
+    public void should_update_category() throws Exception
+    {
+        //GIVEN
+        String name = "IT-CATEGORY-"+ UUID.randomUUID();
+
+        Category category = BeanUtil.createRandomCategoryAndSave
+                (categoryRepository);
+
+        CategoryDTO dto = categoryMapper.toDTO(category);
+        dto.setName(name+"-UPDATED");
 
         //WHEN
-        CategoryDTO categoryDTO = categoryMapper.toDTO(categoryWithId);
-        restMockMvc.perform(post("/api/v1/categories")
+        restMockMvc.perform(put("/api/v1/categories/"+category.getId())
                 .contentType(APPLICATION_JSON_UTF8)
-                .content(convertObjectToJsonBytes(categoryDTO)))
-                .andExpect(status().isBadRequest());
+                .content(convertObjectToJsonBytes(dto)))
+                .andExpect(status().isNoContent());
+
         //THEN
-        List<Category> categoryList = categoryRepository.findAll();
-        assertThat(categoryList).hasSize(sizeBeforeCreate);
+        Category updated = categoryRepository.findById(category.getId()).get();
+        assertThat(updated.getName()).isEqualTo(name+"-UPDATED");
+    }
+
+    @Test
+    @Transactional
+    public void should_return_400_when_category_to_update_is_not_found() throws Exception
+    {
+        //GIVEN
+        String name = "IT-CATEGORY-"+ UUID.randomUUID();
+
+        Category category = BeanUtil.createRandomCategory();
+        category.setId(Integer.MAX_VALUE);
+
+        CategoryDTO dto = categoryMapper.toDTO(category);
+        dto.setName(name+"-UPDATED");
+
+        //WHEN
+        ResultActions result = restMockMvc.perform(put("/api/v1/categories/"+category.getId())
+                .contentType(APPLICATION_JSON_UTF8)
+                .content(convertObjectToJsonBytes(dto)));
+
+        //THEN
+        result.andExpect(status().isNotFound());
     }
 
     @Test
