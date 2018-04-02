@@ -23,7 +23,6 @@ public class CampaignDTOMapper
     {
         Discount discount;
 
-        // TODO DISCOUNT TYPE LOGIC
         if(RATE.equals(dto.getDiscountType()))
         {
             discount = Discount.withRate(dto.getDiscountAmount())
@@ -52,8 +51,7 @@ public class CampaignDTOMapper
 
         dto.setDiscountType(discount.getType());
 
-        // TODO DISCOUNT TYPE LOGIC
-        if(campaign.getDiscount().isType(RATE))
+        if(RATE.equals(campaign.getDiscount().getType()))
         {
             DiscountWithRate rated = discount.castToRate();
             dto.setDiscountAmount(rated.getRate());

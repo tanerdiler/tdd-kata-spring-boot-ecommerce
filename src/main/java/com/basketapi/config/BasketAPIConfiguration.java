@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class BasketAPIConfiguration {
@@ -20,17 +20,15 @@ public class BasketAPIConfiguration {
     }
 
     @Bean
-    public WebMvcConfigurerAdapter adapter() {
-        return new WebMvcConfigurerAdapter() {
+    public WebMvcConfigurer adapter() {
+        return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**");
             }
             @Override
-            public void addInterceptors(InterceptorRegistry registry) {
-                // TODO buraya niye gerek olduğunun analizini yap
-                //registry.addInterceptor(new LogExecutionInterceptor());
-
+            public void addInterceptors(InterceptorRegistry registry){
+                //DO NOTHING
             }
         };
     }

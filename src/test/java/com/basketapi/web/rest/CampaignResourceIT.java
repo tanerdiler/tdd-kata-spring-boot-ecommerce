@@ -23,22 +23,20 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 import static com.basketapi.domain.model.DiscountTargetType.PRODUCT;
+import static com.basketapi.domain.model.DiscountType.PRICE;
 import static com.basketapi.web.rest.TestUtil.APPLICATION_JSON_UTF8;
 import static com.basketapi.web.rest.TestUtil.convertObjectToJsonBytes;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.request
-        .MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request
-        .MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result
-        .MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result
-        .MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
 @RunWith(SpringRunner.class)
@@ -58,6 +56,8 @@ public class CampaignResourceIT
     private CampaignDTOMapper campaignMapper;
     @Autowired
     private ExceptionTranslator exceptionTranslator;
+    @Autowired
+    private EntityManager em;
 
     private MockMvc restMockMvc;
 
@@ -74,15 +74,119 @@ public class CampaignResourceIT
 
     @Test
     @Transactional
-    public void should_create_campaign() throws Exception {
-        //GIVEN
-        campaignRepository.deleteAll();
+    public void should_delete_campaign() throws Exception
+    {
+        String name = "IT-CAMPAIGN-"+UUID.randomUUID();
 
-        int sizeBeforeCreate = campaignRepository.findAll().size();
-        String name = "IT-CAMPAİGN-"+ UUID.randomUUID();
         Category category = BeanUtil.createRandomCategoryAndSave
                 (categoryRepository);
 
+        Product product = BeanUtil.createRandomProductAndSave
+                (category, productRepository);
+
+        Campaign campaign = Campaign.aNew()
+                .withName(name)
+                .withDiscount(Discount.withRate(5d).withLimit(100d).get())
+                .target(product.getId(), PRODUCT)
+                .get();
+
+        campaign = campaignRepository.save(campaign);
+
+        restMockMvc.perform(delete("/api/v1/campaigns/"+campaign.getId()))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @Transactional
+    public void should_update_campaign() throws Exception
+    {
+        //GIVEN
+        String name = "IT-CAMPAIGN-"+ UUID.randomUUID();
+        Category category = BeanUtil.createRandomCategoryAndSave
+                (categoryRepository);
+
+        Product product = BeanUtil.createRandomProductAndSave
+                (category, productRepository);
+
+        Campaign campaign = Campaign.aNew()
+                .withName(name)
+                .withDiscount(Discount.withRate(5d).withLimit(100d).get())
+                .target(product.getId(), PRODUCT)
+                .get();
+
+        Campaign persistedCampaign = campaignRepository.save(campaign);
+        em.detach(persistedCampaign);
+
+        CampaignDTO dto = campaignMapper.toDTO(persistedCampaign);
+        dto.setName(name+"-UPDATED");
+        dto.setDiscountAmount(100d);
+        dto.setDiscountLimit(null);
+        dto.setDiscountType(PRICE);
+
+        //WHEN
+        restMockMvc.perform(put("/api/v1/campaigns/"+persistedCampaign.getId())
+                .contentType(APPLICATION_JSON_UTF8)
+                .content(convertObjectToJsonBytes(dto)))
+                .andExpect(status().isNoContent());
+
+        //THEN
+        Campaign updated = campaignRepository.findById(campaign.getId()).get();
+        assertThat(updated.getName()).isEqualTo(name+"-UPDATED");
+        assertThat(updated.getDiscount().castToPrice().getPrice()).isEqualTo(100d);
+        assertThat(updated.getDiscount().getType()).isEqualTo(PRICE);
+    }
+
+    @Test
+    @Transactional
+    public void should_return_400_when_campaign_to_update_is_not_found() throws Exception
+    {
+        //GIVEN
+        String name = "IT-CAMPAIGN-"+ UUID.randomUUID();
+        Category category = BeanUtil.createRandomCategoryAndSave
+                (categoryRepository);
+
+        Product product = BeanUtil.createRandomProductAndSave
+                (category, productRepository);
+
+        Campaign campaign = Campaign.aNew()
+                .withId(Integer.MAX_VALUE)
+                .withName("xxx")
+                .withDiscount(Discount.withRate(5d).withLimit(100d).get())
+                .target(product.getId(), PRODUCT)
+                .get();
+
+        CampaignDTO dto = campaignMapper.toDTO(campaign);
+
+        //WHEN
+        ResultActions result = restMockMvc.perform(put("/api/v1/campaigns/"+campaign.getId())
+                .contentType(APPLICATION_JSON_UTF8)
+                .content(convertObjectToJsonBytes(dto)));
+
+        //THEN
+        result.andExpect(status().isNotFound());
+    }
+
+    @Test
+    @Transactional
+    public void should_return_400_when_campaign_to_delete_is_not_found() throws
+            Exception
+    {
+        restMockMvc.perform(delete("/api/v1/campaigns/"+(Integer.MAX_VALUE-new
+                Random().nextInt())))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @Transactional
+    public void should_create_campaign() throws Exception {
+        //GIVEN
+
+        int sizeBeforeCreate = campaignRepository.findAll().size();
+
+        String name = "IT-CAMPAIGN-"+ UUID.randomUUID();
+
+        Category category = BeanUtil.createRandomCategoryAndSave
+                (categoryRepository);
         Product product = BeanUtil.createRandomProductAndSave
                 (category, productRepository);
 
@@ -223,7 +327,7 @@ public class CampaignResourceIT
                 .andExpect(jsonPath("$.name")
                         .value(equalTo(campaignWithId.getName())))
                 .andExpect(jsonPath("$.targetId")
-                        .value(equalTo(product.getId())))
+                        .value(equalTo(category.getId())))
                 .andExpect(jsonPath("$.targetType")
                         .value(equalTo("CATEGORY")))
                 .andExpect(jsonPath("$.discountAmount")

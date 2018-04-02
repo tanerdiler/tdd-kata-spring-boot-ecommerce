@@ -8,14 +8,16 @@ import com.basketapi.service.exception.ResourceNotFoundException;
 import com.basketapi.service.mapper.CategoryDTOMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.basketapi.service.ApplicationConstants.*;
+import static org.springframework.transaction.annotation.Isolation.READ_COMMITTED;
+import static org.springframework.transaction.annotation.Isolation.READ_UNCOMMITTED;
 import static org.springframework.transaction.annotation.Propagation.REQUIRED;
 import static org.springframework.transaction.annotation.Propagation.SUPPORTS;
 
@@ -30,8 +32,7 @@ public class CategoryService implements IService
     private CategoryRepository repository;
 
     @Override
-    @Transactional(propagation = SUPPORTS, isolation = Isolation
-            .READ_UNCOMMITTED)
+    @Transactional(propagation = SUPPORTS, isolation = READ_COMMITTED)
     public boolean checkIfExists(@NotNull Integer id)
     {
         return repository.existsById(id);
@@ -71,7 +72,27 @@ public class CategoryService implements IService
         repository.deleteById(id);
     }
 
-    public CategoryDTO find(int id) {
+    @Transactional(readOnly = false, propagation = REQUIRED)
+    public CategoryDTO update(Integer id, @Valid CategoryDTO dto)
+    {
+        if(!checkIfExists(id))
+        {
+            throw new ResourceNotFoundException(FAILED_UPDATING_CATEGORY,
+                    ENTITY_NAME_CATEGORY, id);
+        }
+
+        dto.setId(id);
+
+        Category categoryWithNewInfo = dtoMapper.toEntity(dto);
+
+        Category updatedCategory = repository.save(categoryWithNewInfo);
+
+        return dtoMapper.toDTO(updatedCategory);
+    }
+
+    @Transactional(readOnly = true, propagation = SUPPORTS, isolation = READ_UNCOMMITTED)
+    public CategoryDTO find(int id)
+    {
         return repository.findById(id)
                 .map(dtoMapper::toDTO)
                 .orElseThrow(()

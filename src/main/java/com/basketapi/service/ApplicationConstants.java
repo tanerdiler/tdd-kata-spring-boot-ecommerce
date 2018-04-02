@@ -26,17 +26,28 @@ public class ApplicationConstants
     public static final String ENTITY_NAME_PRODUCT = "product";
     public static final String ENTITY_NAME_CATEGORY = "category";
 
-    public static final String FAILED_SAVING_PRODUCT = "Saving product " +
-            "operation failed";
-    public static final String FAILED_SAVING_CAMPAIGN = "Saving campaign operation failed";
-    public static final String FAILED_SAVING_CATEGORY = "Saving category " +
-            "operation failed";
-    public static final String FAILED_DELETING_CAMPAIGN = "Deleting campaign operation failed";
-    public static final String FAILED_DELETING_CATEGORY = "Deleting category " +
-            "operation failed";
+    public static final String SAVING = "Saving";
+    public static final String FAILED_SAVING_PRODUCT = getFailedOperationMessage(SAVING, ENTITY_NAME_PRODUCT);
+    public static final String FAILED_SAVING_CAMPAIGN = getFailedOperationMessage(SAVING, ENTITY_NAME_CAMPAIGN);
+    public static final String FAILED_SAVING_CATEGORY = getFailedOperationMessage(SAVING, ENTITY_NAME_CATEGORY);
+
+    public static final String DELETING = "Deleting";
+    public static final String FAILED_DELETING_CAMPAIGN = getFailedOperationMessage(DELETING, ENTITY_NAME_CAMPAIGN);
+    public static final String FAILED_DELETING_CATEGORY = getFailedOperationMessage(DELETING, ENTITY_NAME_CATEGORY);
+
     public static final String FAILED_FINDING_CAMPAIGN = "Campaign not found";
     public static final String FAILED_FINDING_PRODUCT = "Product not found";
     public static final String FAILED_FINDING_CATEGORY = "Category not found";
+
+    public static final String UPDATING = "Updating";
+    public static final String FAILED_UPDATING_CAMPAIGN = getFailedOperationMessage(UPDATING, ENTITY_NAME_CAMPAIGN);
+    public static final String FAILED_UPDATING_CATEGORY = getFailedOperationMessage(UPDATING, ENTITY_NAME_CATEGORY);
+    public static final String FAILED_UPDATING_PRODUCT = getFailedOperationMessage(UPDATING, ENTITY_NAME_PRODUCT);
+
+    private static final String getFailedOperationMessage(String operation, String entity)
+    {
+        return String.format("%s %s operation failed", operation, entity);
+    }
 
     private ApplicationConstants()
     {

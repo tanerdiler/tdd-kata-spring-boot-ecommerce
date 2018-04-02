@@ -3,7 +3,7 @@ package com.basketapi.domain.model;
 import java.util.Optional;
 
 public enum DiscountTargetType {
-    CATEGORY, PRODUCT;
+    CATEGORY,PRODUCT;
 
     public static DiscountTargetType of(String name) {
 

@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.validation.Valid;
-import java.net.URISyntaxException;
 
 @Controller
 public class BasketResource
@@ -26,12 +25,9 @@ public class BasketResource
     /**
      * POST  /api/v1/campaigns/apply : Apply campaigns to posted basket
      *
-     * @param basketDTO the basketDTO to be discounted
-     * @return the ResponseEntity with status 201 (Created) and with body the
-     * new basketDTO with discount, or with status 400 (Bad Request) if the
-     * campaign has
-     * already an ID
-     * @throws URISyntaxException if the Location URI syntax is incorrect
+     * @param basket the basketDTO to be discounted
+     * @return the ResponseEntity with status 200 (Ok) and with body the
+     * new basketDTO with discount
      */
     @PostMapping("/api/v1/campaigns/apply")
     public ResponseEntity<BasketDTO> discount(@RequestBody @Valid BasketDTO basket)

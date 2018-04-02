@@ -37,7 +37,6 @@ public class CampaignServiceTest extends BaseMockitoTest
     @Spy
     private CampaignDTOMapper mapper = new CampaignDTOMapper(new BeanValidator());
 
-
     @Test
     public void should_delete_campaign()
             throws BeanValidationException
@@ -59,6 +58,34 @@ public class CampaignServiceTest extends BaseMockitoTest
     }
 
     @Test
+    public void should_update_campaign()
+            throws BeanValidationException
+    {
+        CampaignDTO dto = createDTOWithPriceDiscount(null);
+        Campaign campaign = createCampaign(1, dto);
+        CampaignDTO dtoOfPersistedCampaign = createDTOWithPriceDiscount(1);
+
+        when(campaignService.checkIfExists(any())).thenReturn(true);
+        when(productService.checkIfExists(any())).thenReturn(true);
+        when(repo.save(any(Campaign.class))).thenReturn(campaign);
+
+        CampaignDTO  persistedCampaignDTO = campaignService.update(1, dto);
+        assertThat(persistedCampaignDTO).isEqualToComparingFieldByField(dtoOfPersistedCampaign);
+    }
+
+    @Test(expected = ResourceNotFoundException.class)
+    public void should_throw_ResourceNotFoundException_when_specified_campaign_not_found_on_updating()
+            throws BeanValidationException
+    {
+        CampaignDTO dto = createDTOWithPriceDiscount(null);
+
+        when(campaignService.checkIfExists(any())).thenReturn(false);
+
+        campaignService.update(1, dto);
+    }
+
+
+    @Test
     public void should_save_campaign_with_price_discount()
             throws BeanValidationException
     {
@@ -68,7 +95,6 @@ public class CampaignServiceTest extends BaseMockitoTest
         CampaignDTO dtoOfPersistedCampaign = createDTOWithPriceDiscount(1);
 
         when(productService.checkIfExists(any())).thenReturn(true);
-        when(categoryService.checkIfExists(any())).thenReturn(true);
         when(repo.save(any(Campaign.class))).thenReturn(campaign);
 
         CampaignDTO  persistedCampaignDTO = campaignService.save(dto);
@@ -85,7 +111,6 @@ public class CampaignServiceTest extends BaseMockitoTest
         CampaignDTO dtoOfPersistedCampaign = createDTOWithRateDiscount(1);
 
         when(productService.checkIfExists(any())).thenReturn(true);
-        when(categoryService.checkIfExists(any())).thenReturn(true);
         when(repo.save(any(Campaign.class))).thenReturn(campaign);
 
         CampaignDTO  persistedCampaignDTO = campaignService.save(dto);
@@ -158,7 +183,6 @@ public class CampaignServiceTest extends BaseMockitoTest
         invalidDTO.setDiscountAmount(-100d);
 
         when(productService.checkIfExists(any())).thenReturn(true);
-        when(categoryService.checkIfExists(any())).thenReturn(true);
 
         campaignService.save(invalidDTO);
     }
@@ -186,5 +210,17 @@ public class CampaignServiceTest extends BaseMockitoTest
         invalidDTO.setTargetType(CATEGORY);
 
         campaignService.save(invalidDTO);
+    }
+
+    @Test(expected = ResourceNotFoundException.class)
+    public void should_throw_ResourceNotFoundException_when_campaign_not_found_on_updating()
+            throws BeanValidationException
+    {
+        CampaignDTO dto = createDTOWithPriceDiscount(null);
+
+        when(campaignService.checkIfExists(any())).thenReturn(true);
+        when(productService.checkIfExists(any())).thenReturn(false);
+
+        campaignService.update(1, dto);
     }
 }

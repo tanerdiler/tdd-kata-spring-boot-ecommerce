@@ -8,14 +8,16 @@ import com.basketapi.service.exception.ResourceNotFoundException;
 import com.basketapi.service.mapper.ProductDTOMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.basketapi.service.ApplicationConstants.*;
+import static org.springframework.transaction.annotation.Isolation.READ_COMMITTED;
+import static org.springframework.transaction.annotation.Isolation.READ_UNCOMMITTED;
 import static org.springframework.transaction.annotation.Propagation.REQUIRED;
 import static org.springframework.transaction.annotation.Propagation.SUPPORTS;
 
@@ -33,8 +35,7 @@ public class ProductService implements IService
     private ProductDTOMapper dtoMapper;
 
     @Override
-    @Transactional(propagation = SUPPORTS, isolation = Isolation
-            .READ_UNCOMMITTED)
+    @Transactional(propagation = SUPPORTS, isolation = READ_COMMITTED)
     public boolean checkIfExists(@NotNull Integer id)
     {
         return repository.existsById(id);
@@ -45,17 +46,18 @@ public class ProductService implements IService
     {
         if(!categoryService.checkIfExists(dto.getCategory().getId()))
         {
-            throw new ResourceNotFoundException("Saving product operation " +
-                    "failed",
-                    ENTITY_NAME_CATEGORY, dto.getCategory().getId());
+            throw new ResourceNotFoundException(
+                    "Saving product operation failed",
+                    ENTITY_NAME_CATEGORY,
+                    dto.getCategory().getId());
         }
 
         if(dto.getId()!=null)
         {
-            throw  new
-                    EntityWithIdException(FAILED_SAVING_PRODUCT,
-                    ENTITY_NAME_PRODUCT, dto
-                    .getId());
+            throw  new EntityWithIdException(
+                    FAILED_SAVING_PRODUCT,
+                    ENTITY_NAME_PRODUCT,
+                    dto.getId());
         }
 
         Product productToPersist = dtoMapper.toEntity(dto);
@@ -63,10 +65,30 @@ public class ProductService implements IService
         return dtoMapper.toDTO(repository.save(productToPersist));
     }
 
-    @Transactional(readOnly = true, propagation = SUPPORTS, isolation = Isolation.READ_UNCOMMITTED)
+    @Transactional(propagation = REQUIRED)
+    public ProductDTO update(Integer id, @Valid ProductDTO dto)
+    {
+        if(!checkIfExists(id))
+        {
+            throw new ResourceNotFoundException(FAILED_UPDATING_PRODUCT,
+                    ENTITY_NAME_PRODUCT, id);
+        }
+
+        dto.setId(id);
+
+        Product productWithNewInfo = dtoMapper.toEntity(dto);
+
+        Product updatedProduct = repository.save(productWithNewInfo);
+
+        return dtoMapper.toDTO(updatedProduct);
+    }
+
+    @Transactional(readOnly = true, propagation = SUPPORTS, isolation = READ_UNCOMMITTED)
     public List<ProductDTO> findAll()
     {
-        return repository.findAll().stream().map(dtoMapper::toDTO)
+        return repository.findAll()
+                .stream()
+                .map(dtoMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
@@ -75,14 +97,16 @@ public class ProductService implements IService
     {
         if(!checkIfExists(id))
         {
-            throw new ResourceNotFoundException("Deleting product operation " +
-                    "failed",
+            throw new ResourceNotFoundException(
+                    "Deleting product operation failed",
                     ENTITY_NAME_CAMPAIGN, id);
         }
         repository.deleteById(id);
     }
 
-    public ProductDTO find(int id) {
+    @Transactional(readOnly = true, propagation = SUPPORTS, isolation = READ_UNCOMMITTED)
+    public ProductDTO find(int id)
+    {
         return repository.findById(id)
                 .map(dtoMapper::toDTO)
                 .orElseThrow(()
