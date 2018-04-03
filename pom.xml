@@ -27,6 +27,7 @@
 		<commons-io.version>2.6</commons-io.version>
 		<org.mapstruct.version>1.2.0.Final</org.mapstruct.version>
 		<problem-spring-web.version>0.22.1</problem-spring-web.version>
+		<docker.image.prefix>tanerdiler</docker.image.prefix>
 	</properties>
 
 	<dependencies>
@@ -163,10 +164,6 @@
 					<mainClass>com.basketapi.EcommerceBasketApiApplication</mainClass>
 					<executable>true</executable>
 					<fork>true</fork>
-					<!--
-                    Enable the line below to have remote debugging of your application on port 5005
-                    <jvmArguments>-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005</jvmArguments>
-                    -->
 				</configuration>
 			</plugin>
 	<plugin>
@@ -213,6 +210,36 @@
 					<exclude>**/config/*</exclude>
 				    </excludes>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.spotify</groupId>
+				<artifactId>dockerfile-maven-plugin</artifactId>
+				<version>1.4.0</version>
+				<!--
+                Uncomment the section below to build the docker image with mvn package and and push it with mvn deploy
+                <executions>
+                    <execution>
+                    <id>default</id>
+                    <goals>
+                        <goal>build</goal>
+                        <goal>push</goal>
+                    </goals>
+                    </execution>
+                </executions>
+                -->
+				<configuration>
+					<repository>tanerdiler/basket-service-api</repository>
+					<buildArgs>
+						<JAR_FILE>${project.build.finalName}.jar</JAR_FILE>
+					</buildArgs>
+				</configuration>
+				<!--configuration>
+					<contextDirectory>${project.build.directory}</contextDirectory>
+					<repository>${docker.image.prefix}/${project.artifactId}</repository>
+					<buildArgs>
+						<JAR_FILE>${project.build.finalName}.jar</JAR_FILE>
+					</buildArgs>
+				</configuration-->
 			</plugin>
 		</plugins>
 	</build>

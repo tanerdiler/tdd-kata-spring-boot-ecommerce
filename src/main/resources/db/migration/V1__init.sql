@@ -12,10 +12,6 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
 
--- Dumping database structure for basket_io
-CREATE DATABASE IF NOT EXISTS `basket_io` /*!40100 DEFAULT CHARACTER SET utf8 COLLATE utf8_turkish_ci */;
-USE `basket_io`;
-
 -- Dumping structure for table basket_io.campaigns
 CREATE TABLE IF NOT EXISTS `campaigns` (
   `id` int(11) NOT NULL AUTO_INCREMENT,

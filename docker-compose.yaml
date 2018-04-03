@@ -1,0 +1,34 @@
+version: '2'
+services:
+  mysql:
+    container_name: basket-service-mysql
+    image: mysql/mysql-server:5.7
+    environment:
+      MYSQL_DATABASE: basket_service
+      MYSQL_ROOT_PASSWORD: 1q2w3e4r
+      MYSQL_ROOT_HOST: '%'
+    ports:
+      - "3306:3306"
+    restart: always
+
+  rest-api:
+    container_name: basket-service-api
+    image: tanerdiler/basket-service-api
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    expose:
+        - 8080
+    ports:
+        - 8080:8080
+    environment:
+      - DATABASE_HOST=baskset-service-mysql
+      - DATABASE_USER=root
+      - DATABASE_PASSWORD=1q2w3e4r
+      - DATABASE_NAME=baskset_service
+      - DATABASE_PORT=3306
+    links:
+      - mysql:mysql
+    depends_on:
+      - mysql
