@@ -41,6 +41,7 @@ docker run -d --name basket-service-api --link basket-service-mysql:mysql -p8080
 
 # Container Compose
 
-docker-compose config
+TODO FIX : corrupted jar file
+
 docker-compose up --build
-docker-compose down
+
