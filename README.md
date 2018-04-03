@@ -35,8 +35,8 @@ docker run -d --name basket-service-api --link basket-service-mysql:mysql -p8080
             -e DATABASE_HOST=basket-service-mysql \
             -e DATABASE_PORT=3306 \
             -e DATABASE_NAME=basket_service \
-            -e DATABASE_USER=root \
-            -e DATABASE_PASSWORD=eternal \
+            -e DATABASE_USER=[USERNAME] \
+            -e DATABASE_PASSWORD=[PASSWORD] \
             tanerdiler/basket-service-api
 
 # Container Compose
